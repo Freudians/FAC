@@ -1,14 +1,15 @@
 #!/home/anthonyd/smartcontracts/newtool/pet_proj/env/bin/python3
 
 import argparse
-import vuln_module.RoleViolation as RoleViolation
-from reviser.revision import revise
+from .vuln_module.RoleViolation import detector
+from .reviser.revision import revise
 
 #parse arguments
 #returns a dictionary
 def parse_args() :
     parser = argparse.ArgumentParser()
     parser.add_argument('filename', help="Path to the target solidity file")
+    parser.add_argument("--no_revise", help="simply print the exploit instead of testing it", action="store_true")
     args = parser.parse_args()
     return args
 
@@ -18,9 +19,10 @@ def main() :
     args = parse_args()
     with open(args.filename, "r") as src :
         smart_contract = src.read()
-    exploit = RoleViolation.detector(smart_contract)
-    final_exploit = revise(smart_contract, exploit)
+    exploit = detector(smart_contract)
+    if not args.no_revise :
+        exploit = revise(smart_contract, exploit)
     with open("exploit.sol", "w") as file :
-        file.write(final_exploit)
+        file.write(exploit)
 
 main()

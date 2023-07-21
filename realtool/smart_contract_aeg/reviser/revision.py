@@ -4,12 +4,11 @@
 Module takes a test and a smart contract, revises the test until it works
 """
 import sys
-sys.path.append("/home/anthonyd/smartcontracts/newtool/pet_proj/src")
 import os
 os.environ["OPENAI_API_KEY"] = "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"
 from langchain import PromptTemplate, LLMChain
 from langchain.chat_models import ChatOpenAI
-from Runner.runner import run_test
+from ..Runner.runner import run_test
 
 def revise(contract, test) :
     # set up an LLM chain for revisions
@@ -23,13 +22,14 @@ def revise(contract, test) :
     least 3 functions in the final test contract:
     1] A constructor, which takes no arguments
     2] A function called "setUp", which deploys an instance of the target contract. The exploit will use this instance of the target contract.
-    Ensure that after the target contract is deployed, the exploit contract has not been granted any special privileges whatsoever.
-    If the constructor of Zaima grants ownership to the deployer, make sure to transfer ownership to another address in the setup function.
+    Make sure that the exploit contract is not considered a privileged user by the target contract. If the deployment process of the target contract
+    forces the exploit to be recognized as a privilege user, make sure you remove your privileges.
     3] A function called "test_exploit", which should break the access
     control of the target smart contract by elevating the privileges
     of the exploit contract. By the end of this function, the
-    exploit contract should be recognized as a privileged user. Invoke the minimum number of functions needed to achieve your goal. To verify
-    that the explain works, call ONE privileged function at the end of the test_exploit function.
+    exploit contract should be recognized as a privileged user. Call only the functions necessary to achieve your goal. To verify
+    that the explain works, call ONE privileged function at the end of the test_exploit function. Your only goal is to break
+    the access control of the target smart contract: nothing more, nothing less.
 
     Explanation of access control vulnerabilities:
     Smart contracts often implement access control systems in order to ensure that critical functionality is unable to be accessed by untrusted users.
@@ -54,7 +54,6 @@ def revise(contract, test) :
     llm_chain = LLMChain(llm=llm, prompt=prompt)
     exploit = test
     while True :
-        print(exploit)
         output = run_test(contract, exploit)
         if output == "success" :
             return exploit

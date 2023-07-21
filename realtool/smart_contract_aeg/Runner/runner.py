@@ -26,7 +26,7 @@ def run_test(target, exploit) :
         os.remove("test_dir/script/Counter.s.sol")
     os.chdir("test_dir")
     #actually run the test
-    test_result = subprocess.run("forge test", shell=True, capture_output=True, encoding="utf-8")
+    test_result = subprocess.run("forge test -vvv", shell=True, capture_output=True, encoding="utf-8")
     #cleanup
     os.chdir("..")
     shutil.rmtree("test_dir")

@@ -1,3 +1,10 @@
+Metadata-Version: 2.1
+Name: smart-contract-aeg
+Version: 0.0.1
+Summary: Automatic Exploit Generation for smart contracts
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+
 # Smart Contract AEG
 
 A tool to automatically generate access control exploits for smart contracts.

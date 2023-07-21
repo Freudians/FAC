@@ -1,0 +1,15 @@
+README.md
+pyproject.toml
+smart_contract_aeg/__main__.py
+smart_contract_aeg.egg-info/PKG-INFO
+smart_contract_aeg.egg-info/SOURCES.txt
+smart_contract_aeg.egg-info/dependency_links.txt
+smart_contract_aeg.egg-info/entry_points.txt
+smart_contract_aeg.egg-info/requires.txt
+smart_contract_aeg.egg-info/top_level.txt
+smart_contract_aeg/Runner/__init__.py
+smart_contract_aeg/Runner/runner.py
+smart_contract_aeg/reviser/__init__.py
+smart_contract_aeg/reviser/revision.py
+smart_contract_aeg/vuln_module/RoleViolation.py
+smart_contract_aeg/vuln_module/__init__.py

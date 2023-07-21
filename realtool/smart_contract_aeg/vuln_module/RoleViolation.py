@@ -21,15 +21,18 @@ def detector(contract) :
     The smart contract should be called "Exploit". It should include at least 4 functions:
     1] A constructor, which takes no arguments 
     2] A function called "setUp", which deploys an instance of Zaima. The exploit will use this instance of Zaima.
-    Ensure that after the target contract is deployed, the exploit contract has not been granted any special privileges whatsoever.
-    If the constructor of Zaima grants ownership to the deployer, make sure to transfer ownership to another address in the setup function.
+    Make sure that the exploit contract is not considered a privileged user by the target contract. If the deployment process of the target contract
+    forces the exploit to be recognized as a privilege user, make sure you remove your privileges.
     3] A fallback function to receive payment
     4] A function called "test_exploit", which should break the access control of Zaima. Identify the access control system implemented in the smart contract, and then
     break it by elevating the privileges of the exploit contract. By the end of the "exploit" function, the Exploit smart contract should be recognized
     as a privileged user.
     Include comments explaining how each line of code in the exploit function breaks the access control of Zaima. Do your best to only make
     successful function calls. Bear in mind that "Zaima" is not the actual name of the smart contract, and you should not refer to the smart contract
-    as "Zaima" in the code you produe.
+    as "Zaima" in the code you produce. Call only the functions necessary to achieve your goal. To verify
+    that the explain works, call ONE privileged function at the end of the test_exploit function. Your only goal is to break
+    the access control of Zaima : nothing more, nothing less.
+
     Feel free to include extra functions that are necessary to achieve your goal, but don't expect them to be called.
     At the top of the program you output, have a pragma statement specifying the solidity version, and import the contract loacted at "../src/target.sol"
     The exploit contract you write may depend on code defined in other smart contracts, in particular, the exploit contract.
