@@ -8,8 +8,7 @@ def compiler_err() :
     target = target_file.read()
     exploit_file = open("tests/runner/contracts/compiler_error.sol")
     exploit = exploit_file.read()
-    output = runner.run_test(target, exploit)
-    print("it failed\n" + output["feedback"])
+    runner.run_test(target, exploit)
 
 def runtime_err() :
     target_file = open("tests/runner/contracts/target.sol")
@@ -17,6 +16,12 @@ def runtime_err() :
     exploit_file = open("tests/runner/contracts/runtime_error.sol")
     exploit = exploit_file.read()
     output = runner.run_test(target, exploit)
-    print("it failed\n" + output["feedback"])
-
-runtime_err()
+    print("returned output: \n" + output)
+def working() :
+    target_file = open("tests/runner/contracts/target.sol")
+    target = target_file.read()
+    exploit_file = open("tests/runner/contracts/working.sol")
+    exploit = exploit_file.read()
+    output = runner.run_test(target, exploit)
+    print("returned output: \n" + output)
+working()

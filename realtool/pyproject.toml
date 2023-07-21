@@ -1,0 +1,14 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "smart_contract_aeg"
+version = "0.0.1"
+description = "Automatic Exploit Generation for smart contracts"
+readme = "README.md"
+requires-python = ">=3.10"
+install_requires = [
+    "langchain",
+    "openai"
+]
