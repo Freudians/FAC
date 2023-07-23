@@ -1,0 +1,33 @@
+from ..utils import gen_desc
+from ..config import *
+from langchain.chat_models import ChatOpenAI
+from langchain.prompts import PromptTemplate
+from langchain.chains import LLMChain
+
+def gen_setup_func(contract) :
+    """
+    Generates a function (written in solidity) that deploys a smart contract.
+    takes the source of a smart contract
+    returns a function that setups up the smart contract to be functional
+    """
+    contract_desc = gen_desc(contract)
+    llm = ChatOpenAI(model_name=model, temperature=0)
+    prompt_template = """
+    You are part of a team that is writing tests for a smart contract. Read through my directions carefully.
+    Create a smart contract called "Deployer".
+    Write a function called "setup", in solidity (the same version as the provided contract), that takes no arguments, and deploys the provided smart contract so that it can
+    be used properly in accordance with its description. The setup function is not part of the provided smart contract. Rather,
+    it will be added to a smart contract testing suite and used to deploy this smart contract so that we can run other tests against it.
+    The setup function should return the address of the deployed smart contract.
+    Here's a description of how the provided smart contract should function:
+    {desc}
+    Here's the source file containing the contract:
+    {contract}
+
+    Only output the "setup" function. Do not make ANY modifications to the code
+    of the provided smart contract. Do not output the provided smart contract. Your task is not to modify the provided smart contract.
+    """
+    prompt = PromptTemplate.from_template(prompt_template)
+    gen_setup_llm = LLMChain(llm=llm, prompt=prompt)
+    output = gen_setup_llm({"desc" : contract_desc, "contract" : contract})
+    return output["text"]

@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "smart_contract_aeg"
+version = "0.0.1"
+description = "Automatic Exploit Generation for smart contracts"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "langchain",
+    "openai"
+]
+
+[project.scripts]
+smart_contract_aeg = "smart_contract_aeg:main"
