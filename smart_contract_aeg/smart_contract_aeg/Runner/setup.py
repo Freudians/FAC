@@ -16,7 +16,11 @@ def gen_setup_func(contract) :
     You are part of a team that is writing tests for a smart contract. Read through my directions carefully.
     Create a smart contract called "Deployer".
     Write a function called "setup", in solidity (the same version as the provided contract), that takes no arguments, and deploys the provided smart contract so that it can
-    be used properly in accordance with its description. The setup function is not part of the provided smart contract. Rather,
+    be used properly in accordance with its description. Deployment goes beyond any specific function calls or code actions. Sometimes, it can be as
+    simple as just calling the constructor of the target contract. Other times, further actions need to be performed so that the deployed
+    smart contract is usable, such as invoking further functions or sending it currency. In the setup() function, you should do whatever is necessary
+    to deploy the smart contract provided.
+    The setup function is not part of the provided smart contract. Rather,
     it will be added to a smart contract testing suite and used to deploy this smart contract so that we can run other tests against it.
     The setup function should return the address of the deployed smart contract.
     Here's a description of how the provided smart contract should function:
@@ -31,3 +35,5 @@ def gen_setup_func(contract) :
     gen_setup_llm = LLMChain(llm=llm, prompt=prompt)
     output = gen_setup_llm({"desc" : contract_desc, "contract" : contract})
     return output["text"]
+
+

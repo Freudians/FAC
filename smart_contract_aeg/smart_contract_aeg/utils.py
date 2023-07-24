@@ -29,11 +29,7 @@ def gen_desc(contract) :
     """
     llm = ChatOpenAI(model_name=model, temperature=0)
     prompt_template = """
-    You are writing detailed documentation for a smart contract. Describe all of the following, in great detail:
-    - a general description of the smart contract, in layman's terms
-    - the intended purpose of the smart contract, and how it is supposed to be used
-    - all of the functionality of the smart contract (that is exposed to external users)
-    - how to use each function that the smart contract exposes
+    You are writing detailed documentation for a smart contract. Describe, in great detail, how the smart contract should be able to be used.
 
     Here is the source file. It may contain multiple smart contracts, but focus on the main one:
     {contract}
