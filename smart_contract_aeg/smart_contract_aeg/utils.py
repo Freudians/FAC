@@ -29,10 +29,8 @@ def gen_desc(contract) :
     """
     llm = ChatOpenAI(model_name=model, temperature=0)
     prompt_template = """
-    You are writing detailed documentation for a smart contract. Describe, in great detail, how the smart contract should be able to be used.
-
-    Here is the source file. It may contain multiple smart contracts, but focus on the main one:
     {contract}
+    You are writing documentation for a smart contract. Describe the main use of the smart contract, and how it should operate.
     """
     prompt = PromptTemplate.from_template(prompt_template)
     desc_gen_llm = LLMChain(llm=llm, prompt=prompt)

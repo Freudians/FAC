@@ -4,36 +4,38 @@ Given a smart contract and exploit code, module runs it and records feedback
 import subprocess
 import os
 import shutil
+from brownie import project, exceptions, network, accounts
 
-def run_test(target, exploit) :
+def run_test(target, exploit, setup) :
     """
     runs the exploit against a smart contract
-    takes the source of the target and the source of the exploit - both solidity strings
+    target - source of the target smart contract
+    exploit - the exploit smart contract
+    setup - the smart contract responsible for setting it up
+    returns a string - if successful, string will be "success"
+    if unsuccessful, string will represent failure
     """
-    #copy the program over to forge
-    print(os.getcwd())
-    subprocess.run("forge init --no-commit --force test_dir", shell=True)
-    with open("test_dir/test/exploit.sol", "w") as file :
-        file.write(exploit)
-    with open("test_dir/src/target.sol", "w") as file :
+    #create a project directory and copy over files
+    subprocess.run("brownie init test_dir", shell=True)
+    with open("test_dir/contracts/target.sol", "w") as file :
         file.write(target)
-    #delete extra stuff
-    if os.path.exists("test_dir/src/Counter.sol") :
-        os.remove("test_dir/src/Counter.sol")
-    if os.path.exists("test_dir/test/Counter.t.sol") :
-        os.remove("test_dir/test/Counter.t.sol")
-    if os.path.exists("test_dir/script/Counter.s.sol") :
-        os.remove("test_dir/script/Counter.s.sol")
-    os.chdir("test_dir")
-    #actually run the test
-    test_result = subprocess.run("forge test -vvv", shell=True, capture_output=True, encoding="utf-8")
-    #cleanup
-    os.chdir("..")
-    shutil.rmtree("test_dir")
-    #return result
-    if "FAIL" in test_result.stdout :
-        return test_result.stdout
-    if test_result.stderr :
-       return test_result.stderr 
-    else :
-        return "success"
+    with open("test_dir/contracts/exploit.sol", "w") as file :
+        file.write(exploit)
+    with open("test_dir/contracts/setup.sol", "w") as file :
+        file.write(setup)
+    try :
+        # load project and connect to dev network
+        proj = project.load("test_dir")
+        proj.load_config()
+        network.connect('development')
+        #first deploy
+        deployer = proj.Deployer.deploy({'from': accounts[0]})
+        target_addr = (deployer.setup()).return_value
+        exploit = proj.Exploit.deploy(target_addr, {'from': accounts[1]})
+        exploit.test_exploit()
+    except exceptions.CompilerError as compile_err :
+        return str(compile_err)
+    # clean up 
+    network.disconnect()
+    #shutil.rmtree("test_dir")
+    return "success"
