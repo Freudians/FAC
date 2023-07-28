@@ -3,15 +3,15 @@
 """
 Module takes a test and a smart contract, revises the test until it works
 """
-import smart_contract_aeg.config as config
+from ..config import Config
 import re
 from langchain import PromptTemplate, LLMChain
 from langchain.chat_models import ChatOpenAI
-from smart_contract_aeg.Runner.runner import run_test
+from ..Runner.runner import run_test
 
-def revise(contract, test) :
+def revise(contract, test, setup) :
     # set up an LLM chain for revisions
-    llm = ChatOpenAI(config.model, temperature=0)
+    llm = ChatOpenAI(model_name=Config.model, temperature=0)
     prompt_template = """
     A programmer wrote a test that is intended to break the access
     control system of the target smart contract. When run, the
@@ -38,6 +38,7 @@ def revise(contract, test) :
     calling address doesn't have the requisite role, then it cannot access the critical code. If the address/user tries to access the critical
     operations/code, then the smart contract will simply revert.
 
+    Find the failed line the revised test/exploit. Analyze the lines around it, determine why it failed, and change the code to work.
     Target Contract:
     {source}
 
@@ -54,25 +55,11 @@ def revise(contract, test) :
     exploit = test
     while True :
         print(exploit)
-        output = run_test(contract, exploit)
+        output = run_test(contract, exploit, setup)
         print(output)
-        parsed_output = parse_debug_output(output)
-        for line in parsed_output.split("\n") :
-            print(line.encode('utf-8'))
-        break
         if output == "success" :
             return exploit
         args = {"exploit" : exploit, "source" : contract, "debug_msg" : output}
         unparsed_output = llm_chain(args)
         exploit = unparsed_output["text"]
 
-def parse_debug_output(debug_output) :
-    """
-    parses raw output from forge into natural-language errors that GPT-3 will be able to understand
-    """
-    #remove all non-ascii formatting
-    debug_output = remove_color(debug_output)
-    return debug_output
-
-def remove_color(s):
-    return re.sub(r'\x1b\[([0-9,A-Z]{1,2}(;[0-9]{1,2})?(;[0-9]{3})?)?[m|K]?', '', s)

@@ -4,7 +4,8 @@ Given a smart contract and exploit code, module runs it and records feedback
 import subprocess
 import os
 import shutil
-from brownie import project, exceptions, network, accounts
+from brownie import project, exceptions, network, accounts, history
+import re
 
 def run_test(target, exploit, setup) :
     """
@@ -23,19 +24,35 @@ def run_test(target, exploit, setup) :
         file.write(exploit)
     with open("test_dir/contracts/setup.sol", "w") as file :
         file.write(setup)
+    err = ""
     try :
         # load project and connect to dev network
         proj = project.load("test_dir")
         proj.load_config()
-        network.connect('development')
+    except exceptions.CompilerError as compile_err :
+        err = str(compile_err)
+        shutil.rmtree("test_dir")
+        return err
+    network.connect("development")
+    try:
         #first deploy
         deployer = proj.Deployer.deploy({'from': accounts[0]})
         target_addr = (deployer.setup()).return_value
         exploit = proj.Exploit.deploy(target_addr, {'from': accounts[1]})
         exploit.test_exploit()
-    except exceptions.CompilerError as compile_err :
-        return str(compile_err)
-    # clean up 
-    network.disconnect()
-    #shutil.rmtree("test_dir")
-    return "success"
+    except exceptions.VirtualMachineError as evm_err :
+        failed_tx = history[-1]
+        err_str = failed_tx._error_string(pad=0)
+        # remove color formatting
+        ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+        err_parsed = ansi_escape.sub('', err_str)
+        # format it
+        err = 'Transaction failed with revert message %s \n %s' % (evm_err.revert_msg, err_parsed)
+    finally :
+        network.disconnect()
+        proj.close()
+        shutil.rmtree("test_dir")
+    if err :
+        return err
+    else :
+        return "success"

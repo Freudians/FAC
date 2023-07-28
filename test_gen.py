@@ -1,8 +1,8 @@
 #!/home/anthonyd/smartcontracts/newtool/pet_proj_env/bin/python3
 
 from smart_contract_aeg.smart_contract_aeg.Runner.setup import *
-from smart_contract_aeg.smart_contract_aeg.utils import gen_desc
 import argparse
+from smart_contract_aeg.smart_contract_aeg.utils import load_contracts
 
 def parse_args() :
     parser = argparse.ArgumentParser()
@@ -15,8 +15,9 @@ def parse_args() :
 def main() :
     #first parse the path
     args = parse_args()
-    with open(args.filename, "r") as src :
-        smart_contract = src.read()
-    output = gen_setup_func(smart_contract)
+    contracts = load_contracts(args.filename)
+    output = gen_desc(contracts)
     print(output)
+    setup_func = gen_setup_func(contracts)
+    print(setup_func)
 main()

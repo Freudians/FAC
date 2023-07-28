@@ -21,18 +21,17 @@ def contract_to_retriever(contract) :
     retriever = db.as_retriever(search_kwargs={"k": 1}, )
     return retriever
 
-def gen_desc(contract) :
+def load_contracts(dir_path) :
     """
-    generates a detailed description of a smart contract
-    takes the source of a smart contract as a string
-    returns the description (as a string)
+    loads all contracts from a directory into one massive string
+    dir_path - path to the directory
     """
-    llm = ChatOpenAI(model_name=model, temperature=0)
-    prompt_template = """
-    {contract}
-    You are writing documentation for a smart contract. Describe the main use of the smart contract, and how it should operate.
-    """
-    prompt = PromptTemplate.from_template(prompt_template)
-    desc_gen_llm = LLMChain(llm=llm, prompt=prompt)
-    result = desc_gen_llm({"contract" : contract})
-    return result["text"]
+    contracts = ""
+    for path, dir, files in os.walk(dir_path) :
+        for src_file in files :
+            if os.path.splitext(src_file)[1] != ".sol" :
+                continue
+            with os.open(src_file) as file :
+                contracts += str(os.path.join(path, src_file))
+                contracts += '\n'
+                contracts += file.read()
